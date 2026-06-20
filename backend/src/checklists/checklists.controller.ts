@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { TipoUsuario } from '@prisma/client';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -63,5 +63,10 @@ export class ChecklistsController {
   @Patch(':id/tarefas/:tarefaId')
   updateTarefa(@Param('id') id: string, @Param('tarefaId') tarefaId: string, @Body() dto: UpdateTarefaDto) {
     return this.tarefasService.update(Number(id), Number(tarefaId), dto);
+  }
+
+  @Delete(':id/tarefas/:tarefaId')
+  removeTarefa(@Param('id') id: string, @Param('tarefaId') tarefaId: string) {
+    return this.tarefasService.remove(Number(id), Number(tarefaId));
   }
 }
