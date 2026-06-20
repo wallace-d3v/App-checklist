@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
 import { normalizeDate } from '../../common/utils/normalize-date';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ExecucoesQueryService {
@@ -66,7 +66,7 @@ export class ExecucoesQueryService {
       checklistModelo: true,
       tarefasExecucoes: {
         include: { checklistTarefa: true, foto: true },
-        orderBy: { checklistTarefa: { ordem: 'asc' } },
+        orderBy: { id: 'asc' as const },
       },
     };
   }
