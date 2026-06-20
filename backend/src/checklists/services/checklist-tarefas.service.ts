@@ -37,6 +37,12 @@ export class ChecklistTarefasService {
     return { message: 'Tarefa atualizada com sucesso.' };
   }
 
+  async remove(checklistId: number, tarefaId: number) {
+    await this.findTarefa(checklistId, tarefaId);
+    await this.prisma.checklistTarefa.delete({ where: { id: tarefaId } });
+    return { message: 'Tarefa removida com sucesso.' };
+  }
+
   async reordenar(checklistId: number, dto: ReordenarTarefasDto) {
     await this.checklistsQuery.findOne(checklistId);
 
