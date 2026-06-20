@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DiaSemana } from '@prisma/client';
+import { generateConfirmationCode } from '../../common/utils/generate-confirmation-code';
 import { normalizeDate } from '../../common/utils/normalize-date';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GerarExecucoesDto } from '../dto/gerar-execucoes.dto';
@@ -60,6 +61,7 @@ export class ExecucoesGeracaoService {
             checklistModeloId: modelo.id,
             usuarioId: gerente.id,
             data,
+            codigoConfirmacao: generateConfirmationCode(),
             tarefasExecucoes: {
               create: modelo.tarefas.map((tarefa) => ({ checklistTarefaId: tarefa.id })),
             },
