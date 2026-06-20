@@ -7,8 +7,8 @@ import { SalvarObservacaoDto } from '../dto/salvar-observacao.dto';
 export class ExecucoesTarefasService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async iniciar(execucaoId: number) {
-    const execucao = await this.findExecucaoEditavel(execucaoId);
+  async iniciar(execucaoId: number, usuarioId: number) {
+    const execucao = await this.findExecucaoEditavel(execucaoId, usuarioId);
 
     if (!execucao.iniciadoEm) {
       await this.prisma.checklistExecucao.update({
@@ -20,8 +20,8 @@ export class ExecucoesTarefasService {
     return { message: 'Checklist iniciado com sucesso.' };
   }
 
-  async salvarObservacao(execucaoId: number, tarefaExecucaoId: number, dto: SalvarObservacaoDto) {
-    await this.findExecucaoEditavel(execucaoId);
+  async salvarObservacao(execucaoId: number, tarefaExecucaoId: number, usuarioId: number, dto: SalvarObservacaoDto) {
+    await this.findExecucaoEditavel(execucaoId, usuarioId);
     await this.findTarefaDaExecucao(execucaoId, tarefaExecucaoId);
 
     await this.prisma.checklistTarefaExecucao.update({
@@ -32,8 +32,8 @@ export class ExecucoesTarefasService {
     return { message: 'Observação salva com sucesso.' };
   }
 
-  async concluir(execucaoId: number, tarefaExecucaoId: number) {
-    await this.findExecucaoEditavel(execucaoId);
+  async concluir(execucaoId: number, tarefaExecucaoId: number, usuarioId: number) {
+    await this.findExecucaoEditavel(execucaoId, usuarioId);
     const tarefaExecucao = await this.findTarefaDaExecucao(execucaoId, tarefaExecucaoId);
 
     if (tarefaExecucao.checklistTarefa.exigeFoto && !tarefaExecucao.foto) {
@@ -57,9 +57,9 @@ export class ExecucoesTarefasService {
     return { message: 'Tarefa concluída com sucesso.' };
   }
 
-  private async findExecucaoEditavel(execucaoId: number) {
-    const execucao = await this.prisma.checklistExecucao.findUnique({ where: { id: execucaoId } });
-    if (!execucao) throw new NotFoundException('Execução não encontrada.');
+  private async findExecucaoEditavel(execucaoId: number, usuarioId: number) {
+    const execucao = await this.prisma.checklistExecucao.findFirst({ where: { id: execucaoId, usuarioId } });
+    if (!execucao) throw new NotFoundException('Execução não encontrada para este usuário.');
     if (execucao.status === StatusChecklistExecucao.CONCLUIDO) {
       throw new BadRequestException('Checklist já foi enviado e não pode ser alterado.');
     }
