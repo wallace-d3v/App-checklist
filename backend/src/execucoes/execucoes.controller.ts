@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { TipoUsuario } from '@prisma/client';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -47,14 +48,14 @@ export class ExecucoesController {
 
   @Patch(':id/iniciar')
   @Roles(TipoUsuario.FUNCIONARIO)
-  iniciar(@Param('id') id: string) {
-    return this.tarefasService.iniciar(Number(id));
+  iniciar(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.tarefasService.iniciar(Number(id), user.id);
   }
 
   @Patch(':id/enviar')
   @Roles(TipoUsuario.FUNCIONARIO)
-  enviar(@Param('id') id: string, @Body() dto: EnviarExecucaoDto) {
-    return this.envioService.enviar(Number(id), dto);
+  enviar(@Param('id') id: string, @CurrentUser() user: any, @Body() dto: EnviarExecucaoDto) {
+    return this.envioService.enviar(Number(id), user.id, dto);
   }
 
   @Patch(':execucaoId/tarefas/:tarefaExecucaoId/observacao')
@@ -62,14 +63,15 @@ export class ExecucoesController {
   observacao(
     @Param('execucaoId') execucaoId: string,
     @Param('tarefaExecucaoId') tarefaExecucaoId: string,
+    @CurrentUser() user: any,
     @Body() dto: SalvarObservacaoDto,
   ) {
-    return this.tarefasService.salvarObservacao(Number(execucaoId), Number(tarefaExecucaoId), dto);
+    return this.tarefasService.salvarObservacao(Number(execucaoId), Number(tarefaExecucaoId), user.id, dto);
   }
 
   @Patch(':execucaoId/tarefas/:tarefaExecucaoId/concluir')
   @Roles(TipoUsuario.FUNCIONARIO)
-  concluir(@Param('execucaoId') execucaoId: string, @Param('tarefaExecucaoId') tarefaExecucaoId: string) {
-    return this.tarefasService.concluir(Number(execucaoId), Number(tarefaExecucaoId));
+  concluir(@Param('execucaoId') execucaoId: string, @Param('tarefaExecucaoId') tarefaExecucaoId: string, @CurrentUser() user: any) {
+    return this.tarefasService.concluir(Number(execucaoId), Number(tarefaExecucaoId), user.id);
   }
 }
