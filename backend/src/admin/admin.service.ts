@@ -13,14 +13,14 @@ export class AdminService {
 
   async dashboard(lojaId?: number) {
     const hoje = normalizeDate(new Date());
-    const where = { data: hoje, ...(lojaId ? { lojaId } : {}) };
+    const execucaoWhere = { data: hoje, ...(lojaId ? { lojaId } : {}) };
 
     const [concluidos, pendentes, emAndamento, tarefasConcluidas, tarefasPendentes] = await Promise.all([
-      this.prisma.checklistExecucao.count({ where: { ...where, status: StatusChecklistExecucao.CONCLUIDO } }),
-      this.prisma.checklistExecucao.count({ where: { ...where, status: StatusChecklistExecucao.PENDENTE } }),
-      this.prisma.checklistExecucao.count({ where: { ...where, status: StatusChecklistExecucao.EM_ANDAMENTO } }),
-      this.prisma.checklistTarefaExecucao.count({ where: { checklistExecucao: where, status: StatusTarefaExecucao.CONCLUIDA } }),
-      this.prisma.checklistTarefaExecucao.count({ where: { checklistExecucao: where, status: StatusTarefaExecucao.PENDENTE } }),
+      this.prisma.checklistExecucao.count({ where: { ...execucaoWhere, status: StatusChecklistExecucao.CONCLUIDO } }),
+      this.prisma.checklistExecucao.count({ where: { ...execucaoWhere, status: StatusChecklistExecucao.PENDENTE } }),
+      this.prisma.checklistExecucao.count({ where: { ...execucaoWhere, status: StatusChecklistExecucao.EM_ANDAMENTO } }),
+      this.prisma.checklistTarefaExecucao.count({ where: { checklistExecucao: { is: execucaoWhere }, status: StatusTarefaExecucao.CONCLUIDA } }),
+      this.prisma.checklistTarefaExecucao.count({ where: { checklistExecucao: { is: execucaoWhere }, status: StatusTarefaExecucao.PENDENTE } }),
     ]);
 
     return { data: hoje, resumo: { concluidos, pendentes, emAndamento, tarefasConcluidas, tarefasPendentes } };
